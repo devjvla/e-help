@@ -1,16 +1,20 @@
-const express  = require("express");
-const app      = express();
-const { PORT } = require("./constants.js");
+import Express from "express";
+import AppConstants from "./config/constants.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-app.use(express.json());
-app.get("/", (req, res) => {
+const { PORT } = AppConstants;
+
+const App = Express();
+App.use(Express.json());
+App.get("/", (req, res) => {
   res.send(`PORT IS ${PORT}`);
 });
 
-/* Auth Routes */
-const UserRoutes = require("./routes/user.routes.js");
-app.use("/user", UserRoutes);
+/* Routes Setup */
+import UserRouter from "./routes/user.routes.js";
+App.use("/user", UserRouter);
 
-app.listen(PORT, () => {
+App.listen(PORT, () => {
   console.log(`Running on http://localhost:${PORT}`);
 });
