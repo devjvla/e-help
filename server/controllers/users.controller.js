@@ -12,19 +12,17 @@ class UsersController {
   * If it exists, return a message that email is already registerd
   * If not, create a new user record and return JWT token to user to proceed to login
   * Triggered by: POST request to /signup  <br>
-  * Last Updated Date: March 12, 2024
+  * Last Updated Date: March 16, 2024
   * @async
   * @function
   * @memberOf DatabaseModel
   * @return {db_connection} - returns database connection
   * @author JV Abengona
   */
-  signUpUser = async (req, res, validationResult) => {
+  signupUser = async (req, res, validationResult) => {
     let response_data = { status: false, result: {}, error: null };
 
     try {
-      const { email_address, password } = req.body;
-
       /* Check if data provided is valid */
       const validation_result = validationResult(req).errors;
 
@@ -33,12 +31,12 @@ class UsersController {
           response_data.result[error.path] = error.msg;
         });
       } else {
-        /* Fetch User data */
+        /* Proceed to sign up */
         let userModel = new UserModel();
-        response_data = await userModel.getUser(req.body);
+        response_data = await userModel.signupUser(req.body);
       }
     } catch (error) {
-      response_data.error = error?.message;
+      response_data.error = error.message;
     }
 
     res.json(response_data);

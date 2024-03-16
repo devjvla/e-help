@@ -9,7 +9,7 @@ const ValidationHelper = {
       .trim().escape()
       .notEmpty().withMessage("Last name is required"),
     check("email_address")
-      .trim().escape().normalizeEmail()
+      .trim().escape()
       .notEmpty().withMessage("Email is required").bail()
       .isEmail().withMessage("Email is invalid"),
     check("password")

@@ -5,6 +5,6 @@ import UsersController from "../controllers/users.controller.js";
 
 const UserRouter = Router();
 
-UserRouter.post("/signup", ValidationHelper.SignupForm, (req, res) => UsersController.signUpUser(req, res, validationResult));
+UserRouter.post("/signup", ValidationHelper.SignupForm, (req, res) => UsersController.signupUser(req, res, validationResult));
 
 export default UserRouter;
