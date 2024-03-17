@@ -1,7 +1,7 @@
 class QueryHelper {
   /**
-  * DOCU: This function generates the WHERE Clause of SELECT query based on the params passed to it
-  * Last Updated Date: March 16, 2024
+  * DOCU: This function generates the WHERE Clause of a MySQL query based on the params passed to it
+  * Last Updated Date: March 17, 2024
   * @async
   * @function
   * @param {object}
@@ -9,7 +9,7 @@ class QueryHelper {
   * @memberOf QueryHelper    
   * @author JV Abengona
   **/
-  buildQueryParams = async (params) => {
+  buildWhereClause = async (params) => {
     let response_data = { status: false, result: {}, error: null }
     
     try {

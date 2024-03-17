@@ -71,7 +71,7 @@ class UserModel extends DatabaseModel {
   /**
   * DOCU: Function for fetching a user record
   * Triggered by: UsersController.signUpUser <br>
-  * Last Updated Date: March 16, 2024
+  * Last Updated Date: March 17, 2024
   * @async
   * @function
   * @memberOf DatabaseModel
@@ -85,13 +85,13 @@ class UserModel extends DatabaseModel {
     try {
       /* build query params */
       let queryHelper        = new QueryHelper();
-      let build_query_params = await queryHelper.buildQueryParams(params);
+      let build_where_clause = await queryHelper.buildWhereClause(params);
 
-      if(!build_query_params.status) {
-        throw new Error(build_query_params.error);
+      if(!build_where_clause.status) {
+        throw new Error(build_where_clause.error);
       }
 
-      let { where_clause, bind_params } = build_query_params.result; 
+      let { where_clause, bind_params } = build_where_clause.result; 
 
       const get_user_query = mysqlFormat(`SELECT id FROM users WHERE${where_clause};`, bind_params);
       const [get_user]     = await this.executeQuery("UserModel | getUser", get_user_query);
