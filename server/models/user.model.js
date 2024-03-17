@@ -16,7 +16,7 @@ class UserModel extends DatabaseModel {
   * DOCU: Function will check if email address exists in the database.
   * Proceed in creating a user record if email address doesn't exist in the database.
   * Triggered by: UsersController.signUpUser <br>
-  * Last Updated Date: March 16, 2024
+  * Last Updated Date: March 17, 2024
   * @async
   * @function
   * @memberOf DatabaseModel
@@ -49,11 +49,13 @@ class UserModel extends DatabaseModel {
         throw new Error("An error occured while creating user record.");
       }
       
-      /* Update user record with a encrypt password using created_at as the salt */
-      let encrypt_user_password = await this._encryptPassword({ user_id: create_user.insertId, salt: created_at, password });
-
-      if(!encrypt_user_password.status) {
-        throw new Error(encrypt_user_password.error);
+      /* Update user record with a hashed password using created_at as the salt */
+      if(password) {
+        let hash_user_password = await this._hashPassword({ user_id: create_user.insertId, salt: created_at, password });
+  
+        if(!hash_user_password.status) {
+          throw new Error(hash_user_password.error);
+        }
       }
 
       response_data.status = true;
@@ -106,9 +108,9 @@ class UserModel extends DatabaseModel {
   }
 
   /**
-  * DOCU: Function will update user record with an encrypted password
-  * Triggered by: UsersController._encryptPassword <br>
-  * Last Updated Date: March 16, 2024
+  * DOCU: Function will update user record with an hashed password
+  * Triggered by: this.signupUser <br>
+  * Last Updated Date: March 17, 2024
   * @async
   * @function
   * @memberOf DatabaseModel
@@ -116,16 +118,16 @@ class UserModel extends DatabaseModel {
   * @return {db_connection} - returns database connection
   * @author JV Abengona
   */
-  _encryptPassword = async (params) => {
+  _hashPassword = async (params) => {
     let response_data = { status: false, result: {}, error: null };
     
     try {
       let { user_id, salt, password } = params;
 
-      let encrypt_user_password_query = mysqlFormat("UPDATE users SET password = SHA1(CONCAT(?, ?)) WHERE id = ?;", [salt, password, user_id]);
-      let encrypt_user_password       = await this.executeQuery("UserModel | _encryptPassword", encrypt_user_password_query);
+      let hash_user_password_query = mysqlFormat("UPDATE users SET password = SHA1(CONCAT(?, ?)) WHERE id = ?;", [salt, password, user_id]);
+      let hash_user_password       = await this.executeQuery("UserModel | _hashPassword", hash_user_password_query);
 
-      if(!encrypt_user_password) {
+      if(!hash_user_password) {
         throw new Error("An error occured while updating user password.");
       }
 
