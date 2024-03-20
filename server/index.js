@@ -11,6 +11,13 @@ App.get("/", (req, res) => {
   res.send(`PORT IS ${PORT}`);
 });
 
+App.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 /* Routes Setup */
 import UserRouter from "./routes/user.routes.js";
 App.use(`/${process.env.API_PREFIX}/user`, UserRouter);
