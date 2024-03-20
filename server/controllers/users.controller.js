@@ -8,9 +8,8 @@ import UserModel from "../models/user.model.js";
 */
 class UsersController {
   /**
-  * DOCU: This function will check if the email exists.
-  * If it exists, return a message that email is already registerd
-  * If not, create a new user record and return JWT token to user to proceed to login
+  * DOCU: This function will validate the input provided by the user
+  * If valid, proceed to userModel.signupUser. If not, prompt user with an error message.
   * Triggered by: POST request to /signup  <br>
   * Last Updated Date: March 16, 2024
   * @async
@@ -27,6 +26,7 @@ class UsersController {
       const validation_result = validationResult(req).errors;
 
       if(validation_result.length) {
+        /* Populate object to store input fields with errors */
         validation_result.forEach(error => {
           response_data.result[error.path] = error.msg;
         });
@@ -34,6 +34,41 @@ class UsersController {
         /* Proceed to sign up */
         let userModel = new UserModel();
         response_data = await userModel.signupUser(req.body);
+      }
+    } catch (error) {
+      response_data.error = error.message;
+    }
+
+    res.json(response_data);
+  }
+
+  /**
+  * DOCU: This function will validate if provided email address and password.
+  * If valid, proceed to userModel.signinUser. If not, prompt user with an error message
+  * Triggered by: POST request to /signup  <br>
+  * Last Updated Date: March 20, 2024
+  * @async
+  * @function
+  * @memberOf DatabaseModel
+  * @return {db_connection} - returns database connection
+  * @author JV Abengona
+  */
+  signinUser = async (req, res, validationResult) => {
+    let response_data = { status: false, result: {}, error: null };
+
+    try {
+      /* Check if data provided is valid */
+      const validation_result = validationResult(req).errors;
+
+      if(validation_result.length) {
+        /* Populate object to store input fields with errors */
+        validation_result.forEach(error => {
+          response_data.result[error.path] = error.msg;
+        });
+      } else {
+        /* Proceed to sign in */
+        let userModel = new UserModel();
+        response_data = await userModel.signinUser(req.body);
       }
     } catch (error) {
       response_data.error = error.message;

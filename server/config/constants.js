@@ -9,7 +9,8 @@ const constants = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: 3306
-  }
+  },
+  JWT_TOKEN_EXPIRATION: 1_800_000
 }
 
 export default constants;

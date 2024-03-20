@@ -13,8 +13,8 @@ App.get("/", (req, res) => {
 
 /* Routes Setup */
 import UserRouter from "./routes/user.routes.js";
-App.use("/user", UserRouter);
+App.use(`/${process.env.API_PREFIX}/user`, UserRouter);
 
-App.listen(PORT, () => {
+App.listen(PORT, () => {  
   console.log(`Running on http://localhost:${PORT}`);
 });

@@ -3,7 +3,9 @@ import moment from "moment/moment.js";
 
 import DatabaseModel from "./databse.model/database.model.js";
 
+/* Helpers */
 import QueryHelper from "../helpers/query.helper.js";
+import AuthHelper from "../helpers/auth.helper.js";
 
 /** 
 * @class UserModel
@@ -15,8 +17,8 @@ class UserModel extends DatabaseModel {
   /**
   * DOCU: Function will check if email address exists in the database.
   * Proceed in creating a user record if email address doesn't exist in the database.
-  * Triggered by: UsersController.signUpUser <br>
-  * Last Updated Date: March 17, 2024
+  * Triggered by: UsersController.signupUser <br>
+  * Last Updated Date: March 18, 2024
   * @async
   * @function
   * @memberOf DatabaseModel
@@ -34,8 +36,8 @@ class UserModel extends DatabaseModel {
       let get_user = await this.getUser({ email_address });
 
       /* 
-      Immediately throw an error when get user objet has value and password has value.
-      Password is empty if user used sign up with Google
+        Immediately throw an error when get user objet has value and password has value.
+        Password is empty if user used sign up with Google
       */
       if(Object.keys(get_user.result).length && password) {
         throw new Error("Email address is already registered.");
@@ -58,10 +60,66 @@ class UserModel extends DatabaseModel {
         }
       }
 
+      /* Create token */
+      let authHelper   = new AuthHelper();
+      let create_token = await authHelper.createToken({ email_address });
+
+      if(!create_token.status) {
+        throw new Error(create_token.error);
+      }
+
       response_data.status = true;
       response_data.result = {
+        first_name, last_name,
         user_id: create_user.insertId,
-        first_name, last_name
+        token: create_token.result
+      }
+    } catch (error) {
+      response_data.error = error.message;
+    }
+
+    return response_data;
+  }
+
+  /**
+  * DOCU: Function will fetch a user record that matches the given email address and password.
+  * Triggered by: UsersController.signinUser <br>
+  * Last Updated Date: March 20, 2024
+  * @async
+  * @function
+  * @memberOf DatabaseModel
+  * @param {object} - params (email_address, password)
+  * @return {db_connection} - returns database connection
+  * @author JV Abengona
+  */
+  signinUser = async (params) => {
+    let response_data = { status: false, result: {}, error: null };
+
+    try {
+      let { email_address, password } = params;
+
+      /* Get user using email_address and password */
+      let get_user_query = mysqlFormat(`SELECT id, first_name, last_name FROM users WHERE email_address = ? AND password = SHA1(CONCAT(created_at, ?));`, [email_address, password]);
+      let [get_user]     = await this.executeQuery("UserModel | SigninUser", get_user_query);
+
+      if(!get_user) {
+        throw new Error("Username or password does not match.");
+      }
+
+      /* Create token */
+      let authHelper   = new AuthHelper();
+      let create_token = await authHelper.createToken({ email_address });
+
+      if(!create_token.status) {
+        throw new Error(create_token.error);
+      }
+
+      response_data.status = true;
+      response_data.result = { 
+        user_id: get_user.id,
+        first_name: get_user.first_name, 
+        last_name: get_user.last_name,
+        token: create_token.result
       }
     } catch (error) {
       response_data.error = error.message;

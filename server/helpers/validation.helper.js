@@ -18,6 +18,14 @@ const ValidationHelper = {
     check("confirm_password")
       .notEmpty().withMessage("Password should be confirmed").bail()
       .matches("password").withMessage("Passwords should match")
+  ],
+  SigninForm: [
+    check("email_address")
+      .trim().escape()
+      .notEmpty().withMessage("Email is required").bail()
+      .isEmail().withMessage("Email is invalid"),
+    check("password")
+      .notEmpty().withMessage("Password is required").bail()
   ]
 }
 
