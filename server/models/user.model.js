@@ -84,7 +84,7 @@ class UserModel extends DatabaseModel {
   /**
   * DOCU: Function will fetch a user record that matches the given email address and password.
   * Triggered by: UsersController.signinUser <br>
-  * Last Updated Date: March 20, 2024
+  * Last Updated Date: March 22, 2024
   * @async
   * @function
   * @memberOf DatabaseModel
@@ -103,7 +103,7 @@ class UserModel extends DatabaseModel {
       let [get_user]     = await this.executeQuery("UserModel | SigninUser", get_user_query);
 
       if(!get_user) {
-        throw new Error("Username or password does not match.");
+        throw new Error("Email address or password is incorrect.");
       }
 
       /* Create token */
